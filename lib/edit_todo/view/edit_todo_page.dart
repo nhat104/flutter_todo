@@ -13,7 +13,7 @@ class EditTodoPage extends StatelessWidget {
     return MaterialPageRoute(
       fullscreenDialog: true,
       builder: (context) => BlocProvider(
-        create: (context) => EditTodoBloc(
+        create: (context) => EditTodoCubit(
           context.read<TodosRepository>(),
           initialTodo,
         ),
@@ -24,7 +24,7 @@ class EditTodoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<EditTodoBloc, EditTodoState>(
+    return BlocListener<EditTodoCubit, EditTodoState>(
       listenWhen: (previous, current) =>
           previous.status != current.status &&
           current.status == EditTodoStatus.success,
@@ -40,9 +40,9 @@ class EditTodoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final status = context.select((EditTodoBloc bloc) => bloc.state.status);
+    final status = context.select((EditTodoCubit bloc) => bloc.state.status);
     final isNewTodo = context.select(
-      (EditTodoBloc bloc) => bloc.state.isNewTodo,
+      (EditTodoCubit bloc) => bloc.state.isNewTodo,
     );
     final theme = Theme.of(context);
     final floatingActionButtonTheme = theme.floatingActionButtonTheme;
@@ -67,20 +67,28 @@ class EditTodoView extends StatelessWidget {
             : fabBackgroundColor,
         onPressed: status.isLoadingOrSuccess
             ? null
-            : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
+            : () => context.read<EditTodoCubit>().onSubmitted(),
         child: status.isLoadingOrSuccess
             ? const CupertinoActivityIndicator()
             : const Icon(Icons.check_rounded),
       ),
-      body: CupertinoScrollbar(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: const [_TitleField(), _DescriptionField()],
+      body: BlocBuilder<EditTodoCubit, EditTodoState>(
+        builder: (context, state) {
+          return CupertinoScrollbar(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _TitleField(),
+                    Text(state.title),
+                    _DescriptionField()
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -92,7 +100,7 @@ class _TitleField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final state = context.watch<EditTodoBloc>().state;
+    final state = context.watch<EditTodoCubit>().state;
     final hintText = state.initialTodo?.title ?? '';
 
     return TextFormField(
@@ -109,7 +117,7 @@ class _TitleField extends StatelessWidget {
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s]')),
       ],
       onChanged: (value) {
-        context.read<EditTodoBloc>().add(EditTodoTitleChanged(value));
+        context.read<EditTodoCubit>().onTitleChanged('value $value');
       },
     );
   }
@@ -122,7 +130,7 @@ class _DescriptionField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    final state = context.watch<EditTodoBloc>().state;
+    final state = context.watch<EditTodoCubit>().state;
     final hintText = state.initialTodo?.description ?? '';
 
     return TextFormField(
@@ -139,7 +147,7 @@ class _DescriptionField extends StatelessWidget {
         LengthLimitingTextInputFormatter(300),
       ],
       onChanged: (value) {
-        context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
+        context.read<EditTodoCubit>().onDescriptionChanged(value);
       },
     );
   }
