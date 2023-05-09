@@ -23,19 +23,6 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
-// Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
-//   FlutterError.onError = (details) {
-//     log(details.exceptionAsString(), stackTrace: details.stack);
-//   };
-
-//   Bloc.observer = const AppBlocObserver();
-
-//   await runZonedGuarded(
-//     () async => runApp(await builder()),
-//     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
-//   );
-// }
-
 void bootstrap({required TodosApi todosApi}) {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
@@ -43,10 +30,10 @@ void bootstrap({required TodosApi todosApi}) {
 
   Bloc.observer = const AppBlocObserver();
 
-  // final todosRepository = TodosRepository(todosApi: todosApi);
+  final todosRepository = TodosRepository(todosApi: todosApi);
 
   runZonedGuarded(
-    () => runApp(App()),
+    () => runApp(App(todosRepository: todosRepository)),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
   );
 }

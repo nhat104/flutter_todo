@@ -14,7 +14,7 @@ class EditTodoPage extends StatelessWidget {
       fullscreenDialog: true,
       builder: (context) => BlocProvider(
         create: (context) => EditTodoBloc(
-          // context.read<TodosRepository>(),
+          context.read<TodosRepository>(),
           initialTodo,
         ),
         child: const EditTodoPage(),
@@ -122,16 +122,16 @@ class _DescriptionField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    // final state = context.watch<EditTodoBloc>().state;
-    // final hintText = state.initialTodo?.description ?? '';
+    final state = context.watch<EditTodoBloc>().state;
+    final hintText = state.initialTodo?.description ?? '';
 
     return TextFormField(
       key: const Key('editTodoView_description_textFormField'),
-      initialValue: 'state.description',
+      initialValue: state.description,
       decoration: InputDecoration(
-        // enabled: !state.status.isLoadingOrSuccess,
+        enabled: !state.status.isLoadingOrSuccess,
         labelText: l10n.editTodoDescriptionLabel,
-        // hintText: hintText,
+        hintText: hintText,
       ),
       maxLength: 300,
       maxLines: 7,
@@ -139,7 +139,7 @@ class _DescriptionField extends StatelessWidget {
         LengthLimitingTextInputFormatter(300),
       ],
       onChanged: (value) {
-        // context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
+        context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
       },
     );
   }

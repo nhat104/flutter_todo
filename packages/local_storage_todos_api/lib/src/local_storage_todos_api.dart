@@ -61,20 +61,38 @@ class LocalStorageTodosApi extends TodosApi {
   }
 
   @override
-  Future<int> clearCompleted() {
-    // TODO: implement clearCompleted
-    throw UnimplementedError();
+  Future<int> clearCompleted() async {
+    final todos = [..._todoStreamController.value];
+    final completedTodosAmount = todos.where((t) => t.isCompleted).length;
+    todos.removeWhere((t) => t.isCompleted);
+    _todoStreamController.add(todos);
+    await _setValue(kTodosCollectionKey, json.encode(todos));
+    return completedTodosAmount;
   }
 
   @override
-  Future<int> completeAll({required bool isCompleted}) {
-    // TODO: implement completeAll
-    throw UnimplementedError();
+  Future<int> completeAll({required bool isCompleted}) async {
+    final todos = [..._todoStreamController.value];
+    final changedTodosAmount =
+        todos.where((t) => t.isCompleted != isCompleted).length;
+    final newTodos = [
+      for (final todo in todos) todo.copyWith(isCompleted: isCompleted)
+    ];
+    _todoStreamController.add(newTodos);
+    await _setValue(kTodosCollectionKey, json.encode(newTodos));
+    return changedTodosAmount;
   }
 
   @override
-  Future<void> deleteTodo(String id) {
-    // TODO: implement deleteTodo
-    throw UnimplementedError();
+  Future<void> deleteTodo(String id) async {
+    final todos = [..._todoStreamController.value];
+    final todoIndex = todos.indexWhere((t) => t.id == id);
+    if (todoIndex == -1) {
+      throw TodoNotFoundException();
+    } else {
+      todos.removeAt(todoIndex);
+      _todoStreamController.add(todos);
+      return _setValue(kTodosCollectionKey, json.encode(todos));
+    }
   }
 }

@@ -6,31 +6,21 @@ import 'package:flutter_todos/theme/theme.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 class App extends StatelessWidget {
-  const App({super.key, this.todosRepository});
+  const App({super.key, required this.todosRepository});
 
-  final TodosRepository? todosRepository;
+  final TodosRepository todosRepository;
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-      // value: todosRepository,
-      value: [],
-      child: const AppView(),
-    );
-  }
-}
-
-class AppView extends StatelessWidget {
-  const AppView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: FlutterTodosTheme.light,
-      darkTheme: FlutterTodosTheme.dark,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const HomePage(),
+      value: todosRepository,
+      child: MaterialApp(
+        theme: FlutterTodosTheme.light,
+        darkTheme: FlutterTodosTheme.dark,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const HomePage(),
+      ),
     );
   }
 }

@@ -28,10 +28,7 @@ class TodoListTile extends StatelessWidget {
         alignment: Alignment.centerRight,
         color: theme.colorScheme.error,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: const Icon(
-          Icons.delete,
-          color: Color(0xAAFFFFFF),
-        ),
+        child: const Icon(Icons.delete, color: Color(0xAAFFFFFF)),
       ),
       child: ListTile(
         onTap: onTap,
